@@ -1,3 +1,5 @@
+Securin-Recipe-Data-Collection
+
 
 At first We need to insert the Data to Database Mongodb which is coded in server.js. Once You connected to the db it will get store
 <img width="1392" height="361" alt="image" src="https://github.com/user-attachments/assets/b0aff33c-3520-47d1-b4bf-58890ad162d7" />
@@ -14,6 +16,9 @@ Pagination:
 
 Steps To run:
 >npm install mongoose
+
 >npm install express
+
 >node fix.js
+
 >node server.js ----> To run in the localhost
