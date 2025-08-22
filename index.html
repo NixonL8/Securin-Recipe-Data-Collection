@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Recipe Data Collection</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #fafafa;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 1em;
+    
+    }
+    section[aria-label="Recipe Filters"] > div {
+      margin-bottom: 10px;
+    }
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      max-width: 300px;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #555; 
+      border: none;
+      border-radius: 4px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #333; 
+    }
+    #status {
+      text-align: center;
+      margin: 15px 0;
+      font-style: italic;
+      color: #666;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: left;
+      vertical-align: top;
+      font-size: 14px;
+    }
+    th {
+      background-color: #888; /* Neutral gray header */
+      color: white;
+    }
+    tbody tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <h1>Recipe Explorer</h1>
+
+  <section aria-label="Recipe Filters">
+    <div>
+      <input type="text" id="title" placeholder="Title" aria-label="Title" />
+    </div>
+    <div>
+      <input type="text" id="cuisine" placeholder="Cuisine" aria-label="Cuisine" />
+    </div>
+    <!-- Removed Min and Max Calories inputs -->
+    <div>
+      <input type="number" id="mintotal_time" placeholder="Min Total Time" aria-label="Minimum Total Time" />
+    </div>
+    <div>
+      <input type="number" id="maxtotal_time" placeholder="Max Total Time" aria-label="Maximum Total Time" />
+    </div>
+    <div>
+      <input type="number" id="minrating" placeholder="Min Rating" aria-label="Minimum Rating" step="0.1" />
+    </div>
+    <div>
+      <input type="number" id="maxrating" placeholder="Max Rating" aria-label="Maximum Rating" step="0.1" />
+    </div>
+    <div>
+      <button id="filterBtn">Filter</button>
+    </div>
+    <div>
+      <button id="nextBtn">Next Page</button>
+    </div>
+  </section>
+
+  <p id="status">Loading, please wait...</p>
+
+  <table aria-label="Recipe Results" border="1" cellspacing="0" cellpadding="5" width="100%">
+    <thead>
+      <tr>
+        <th>Cuisine</th>
+        <th>Title</th>
+        <th>Rating</th>
+        <th>Prep Time</th>
+        <th>Cook Time</th>
+        <th>Total Time</th>
+        <th>Description</th>
+        <th>Nutrients</th>
+        <th>Serves</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+
+  <script>
+    (() => {
+      let currentPage = 1;
+      let filters = {};
+
+      const statusEl = document.getElementById('status');
+      const tableBody = document.getElementById('tableBody');
+      const filterBtn = document.getElementById('filterBtn');
+      const nextBtn = document.getElementById('nextBtn');
+
+      async function fetchRecipes(page = 1, queryFilters = {}) {
+        let url = `/recipes?page=${page}`;
+        for (const [key, value] of Object.entries(queryFilters)) {
+          if (value) {
+            url += `&${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
+          }
+        }
+        statusEl.textContent = 'Loading, please wait...';
+
+        try {
+          const response = await fetch(url);
+          if (!response.ok) throw new Error('Network response was not ok');
+          const recipes = await response.json();
+
+          if (page === 1) tableBody.innerHTML = '';
+
+          if (recipes.length === 0) {
+            if (page === 1) {
+              statusEl.textContent = 'No records found.';
+              tableBody.innerHTML = '';
+            } else {
+              statusEl.textContent = 'No more records available.';
+              currentPage--;
+            }
+            return;
+          }
+
+          for (const rec of recipes) {
+            const nutrients = rec.nutrients ? JSON.stringify(rec.nutrients) : '';
+            const rowHTML = `
+              <tr>
+                <td>${rec.cuisine || ''}</td>
+                <td>${rec.title || ''}</td>
+                <td>${rec.rating || ''}</td>
+                <td>${rec.prep_time || ''}</td>
+                <td>${rec.cook_time || ''}</td>
+                <td>${rec.total_time || ''}</td>
+                <td>${rec.description || ''}</td>
+                <td>${nutrients}</td>
+                <td>${rec.serves || ''}</td>
+              </tr>
+            `;
+            tableBody.insertAdjacentHTML('beforeend', rowHTML);
+          }
+
+          statusEl.textContent = `${recipes.length} record(s) loaded on page ${page}`;
+        } catch (error) {
+          statusEl.textContent = 'Error loading data.';
+          console.error('Fetch error:', error);
+        }
+      }
+
+      function applyFilters() {
+        filters = {
+          title: document.getElementById('title').value.trim(),
+          cuisine: document.getElementById('cuisine').value.trim(),
+          // Removed mincalories and maxcalories from filters
+          mintotal_time: document.getElementById('mintotal_time').value.trim(),
+          maxtotal_time: document.getElementById('maxtotal_time').value.trim(),
+          minrating: document.getElementById('minrating').value.trim(),
+          maxrating: document.getElementById('maxrating').value.trim()
+        };
+        currentPage = 1;
+        fetchRecipes(currentPage, filters);
+      }
+    function loadNextPage() {
+        currentPage++;
+        fetchRecipes(currentPage, filters);
+      }
+
+      filterBtn.addEventListener('click', applyFilters);
+      nextBtn.addEventListener('click', loadNextPage);
+
+      window.addEventListener('DOMContentLoaded', () => {
+        fetchRecipes(currentPage, filters);
+      });
+    })();
+  </script>
+</body>
+</html>
