@@ -10,8 +10,12 @@ Next we need to create a backend to implement filter,pagination,clear..etc
 <img width="1891" height="952" alt="image" src="https://github.com/user-attachments/assets/8fa4f98c-d7b2-4837-9ba1-d5fd9af48566" />
 
 Filteration:
+Fltering the data base on the inputs
+
 <img width="1918" height="822" alt="image" src="https://github.com/user-attachments/assets/013795c8-b55f-4e86-9d94-bac291391dc5" />
 Pagination:
+Splitting the records into different partitions
+
 <img width="1898" height="965" alt="image" src="https://github.com/user-attachments/assets/2476c9a6-74c5-4a41-a863-b56a3641ba67" />
 
 Steps To run:
