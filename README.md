@@ -6,7 +6,7 @@ At first We need to insert the Data to Database Mongodb which is coded in server
 The data given in json format store in db as object 
 Before that we have to flexible all schema so that we can parse and do the execution so that i created fix.js to make all schema in acceptable manner.
 <img width="1537" height="898" alt="image" src="https://github.com/user-attachments/assets/5cd1ab8e-54c6-4cdc-a7b6-2546a13f9e21" />
-Next we need to create a backend to implement filter,pagination,clear..etc
+Next we need to create a frontend to implement filter,pagination,clear..etc
 <img width="1891" height="952" alt="image" src="https://github.com/user-attachments/assets/8fa4f98c-d7b2-4837-9ba1-d5fd9af48566" />
 
 Filteration:
